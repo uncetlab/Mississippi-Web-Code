@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Get2College | Home Page{% endblock %}
+
+{% block content %}
+    <div class="container position-relative">
+        <div class="row">
+            <div class="col-md-9 p-0 position-relative">
+                <video height="500" id="videojs-vr-player1" class="video-js vjs-default-skin videowdhm" controls playsinline crossorigin="anonymous">
+                    <source src="{{video.url}}" crossorigin="anonymous">
+                </video>
+                <div class="video-static-content">
+                	<img src="{% static 'webapp/images/video-play-btn.png' %}" alt="Play Video" class="video-play-btn" />
+                    {% if video.thumbnail %}
+                        <img src="{{api_url}}{{video.thumbnail}}" alt="Video"  class="video-thumb"/>
+                    {% else %}
+                	   <img src="{% static 'webapp/images/video-thumb.jpg' %}" alt="Video"  class="video-thumb"/>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-3 pr-0">
+                <div class="tileverticalscroll">
+                {% for tile in active_tiles %}
+                    <a href="{% if tile.url_type == 'external' %}{{tile.url}}{% else %}{% url 'custom-page' tile.page %}{% endif %}"  target="{% if tile.url_type == 'external' %}_blank{% endif %}" class="hometilearea">
+                        <div class="tile-img">
+                            {% if tile.image %}
+                                <img src='{{api_url}}{{tile.image}}' class="mw-100" />
+                            {% else %}
+                                <img src="{% static 'webapp/images/default-img.png' %}" class="mw-100" />
+                            {% endif %}
+                            <div class="tile-title p-1">{{tile.title}}</div>
+                        </div>
+                    </a>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="bg-1"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+  		<div class="bg-2"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+  		<div class="bg-3"><img src="{% static 'webapp/images/bg-2.png' %}"/></div>
+    </div>
+{% endblock %}

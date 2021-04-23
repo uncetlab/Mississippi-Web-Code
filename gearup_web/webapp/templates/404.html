@@ -1,0 +1,31 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="shortcut icon" href="{% static 'webapp/images/favicon.png' %}" type="image/x-icon">
+    <title>
+		{% block title %}Get2College{% endblock %}
+	</title>
+    <link href="{% static 'webapp/bootstrap/css/bootstrap.min.css' %}" type="text/css" rel="stylesheet" />
+    <link href="{% static 'webapp/css/styles.css' %}" type="text/css" rel="stylesheet" />
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container-fluid">
+            {% include 'menu.html' %}
+        </div>
+        <div class="page404">
+                <h1 class="text-center">Page not found !</h1>
+                <p class="text-center">Page you are trying to access is not availabe or you don't have enough permission to see this.</p>
+                <p class="text-center"><button onclick="window.location.href = '/';" class="btn btn-primary">Go back to Home</button></p>
+            </div>
+        <div class="push"></div>
+    </div>
+    <footer class="sticky-footer" class="py-4 bg-dark text-white-50">
+        <div class="container text-center"> <small>Copyright &copy; Get2College</small> </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Get2College | Disability Access{% endblock %}
+{% block content %}
+<div class="container position-relative bg-white">
+	<div class="row mb-2">
+		<div class="col-md-12 d-flex">
+			<h1 class="page-title">Disability Access</h1>
+			<div class="input-group ml-auto w-25 mt-3">
+			  <input type="text" id="search" class="form-control deletable" placeholder="Search" aria-label="Search" aria-describedby="search">
+			  <div class="input-group-append">
+				<button id="btnSearch" class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+			  </div>
+
+			</div>
+		</div>
+	</div>
+	<hr/>
+	<div class="row mb-2" id="ajax_loader">
+		<div class="col-md-12">
+			<div class="viewmore-colg" id="viewmore">
+				View more colleges
+			</div>
+		</div>
+	</div>
+
+	<div class="inrbg-1"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+    <div class="inrbg-2"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+    <div class="inrbg-3"><img src="{% static 'webapp/images/bg-2.png' %}"/></div>
+  </div>
+  <div class="preloader">
+  <i class="fa fa-spin fa-spinner fa-2x"></i>
+</div>
+   <script type="text/javascript">
+	   $(document).ready(function() {
+			$('#viewmore').hide();
+			$('.preloader').show();
+			var remove_flag = true;
+			var url = '{{ api_url }}' + 'api/colleges/';
+			fetch_colleges(url);
+
+			$('input.deletable').wrap('<span class="deleteicon" />').after($('<span/>').click(function() {
+                    $(this).prev('input').val('').trigger('change').focus();
+                    var remove_flag = true;
+                    var url = '{{ api_url }}' + 'api/colleges/';
+                    fetch_colleges(url);
+            }));
+
+			$("#viewmore").on("click", function () {
+				$('#viewmore').hide();
+				fetch_colleges(url);
+			});
+			
+			$("#btnSearch").on("click", function () {
+				keyword = $('#search').val();
+				if (keyword == ''){
+					swal("Please enter a keyword to search!", {
+					  icon: "warning",
+					  buttons: false,
+					  timer: 2000,
+					});
+					return;
+				}
+				$('.preloader').show();
+				remove_flag = true;
+				var url = '{{ api_url }}' + 'api/colleges/';
+				fetch_colleges(url)
+			});
+
+			function fetch_colleges(api_url) {
+				var params = {
+					'query' : $('#search').val(),
+					'disability_access' : true}
+				var filter_data = {}
+				filter_data['filter'] = params;
+				$.ajax({
+				  type: "POST",
+				  headers: {
+						'Authorization': 'Bearer ' + '{{ api_token }}',
+						'Content-Type':'application/json'
+				  },
+				  url: api_url,
+				  dataType: 'json',
+				  data: JSON.stringify(filter_data),
+				  success: function(response){
+					var api_url = '{{ api_url }}';
+					if (remove_flag){
+						$('.dy-box').remove();
+					}
+					var results = response.results;
+					for(var i=0; i < results.length; i++){
+						if (results[i].logo != null) {
+							img_path = api_url + results[i].logo;
+						} else{
+							img_path = '/static/webapp/images/default-thumb.jpg';
+						}
+						tags_list = results[i].tags.split(',')
+						var tag_div = ''
+						for(var j=0; j < tags_list.length;j++)
+						{
+							tag_div = tag_div + '<div class="tagitem">'+ tags_list[j] +'</div>'
+						}
+						$('#ajax_loader').before('<div class="row mb-2 dy-box"><div class="col-md-12"><div class="collegelistitem"><div class="collegelistimg mr-3"><div class="imgwrap1"><div class="imgwrap2"><img src="' + img_path + '" alt="college logo"></div></div></div><div class="collegetitletag"><h1>'+ results[i].name +'</h1> ' + tag_div + '</div><div class="viewclgdetailsbtn mt-3"><a target="_blank" href="' + results[i].disability_access_url + '" class="btn btn-sm btn-primary">View Details</a></div></div></div></div>');
+					}
+					$('.preloader').hide();
+					if (response.next != null){
+						url = response.next;
+						remove_flag = false;
+						$('#viewmore').show();
+					}
+					else{
+						$('#viewmore').hide();
+					}
+					if (results.length == 0){
+						$('#ajax_loader').before('<div class="row mb-2 dy-box"><div class="col-md-12 text-center"><span class="no_result"><i class="fas fa-exclamation-triangle text-warning"></i> No result found</span></div></div>');
+						$('#viewmore').hide();
+					}
+				  },
+				  error: function(XMLHttpRequest, textStatus, errorThrown) {
+					$('.preloader').hide();
+				  }
+				});
+			}
+		});
+   </script>
+{% endblock %}

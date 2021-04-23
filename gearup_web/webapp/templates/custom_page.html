@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Get2College | {{title}}{% endblock %}
+
+{% block content %}
+    <div class="container position-relative bg-white">
+        <div class="row mb-2">
+            <div class="col-md-12">
+            	<h1 class="page-title">{{title}}</h1>
+            </div>
+        </div>
+        {% if video %}
+            <div class="row">
+                <div class="col-md-12 p-0">
+                    <video height="500" id="videojs-vr-player1" class="video-js vjs-default-skin videowd" controls playsinline crossorigin="anonymous">
+                        <source src="{{video.url}}" crossorigin="anonymous">
+                    </video>
+                    <div class="video-static-content">
+                        <img src="{% static 'webapp/images/video-play-btn.png' %}" alt="Play Video" class="video-play-btn" />
+                        {% if video.thumbnail %}
+                            <img src="{{api_url}}{{video.thumbnail}}" alt="Video"  class="video-thumb"/>
+                        {% else %}
+                            <img src="{% static 'webapp/images/video-thumb.jpg' %}" alt="Video"  class="video-thumb"/>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="row ml-1 mr-1 ">
+            <div class="col-md-12 pt-2 pb-5 contentarea">{{content|safe}}</div>
+        </div>
+       <div class="inrbg-1"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+       <div class="inrbg-2"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+       <div class="inrbg-3"><img src="{% static 'webapp/images/bg-2.png' %}"/></div>
+  </div>
+{% endblock %}

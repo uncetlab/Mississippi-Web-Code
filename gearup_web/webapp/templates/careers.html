@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Get2College | MS Careers{% endblock %}
+{% block content %}
+  <div class="container position-relative bg-white">
+    <div class="row mb-2">
+        <div class="col-md-12 d-flex">
+            <h1 class="page-title">MS Careers</h1>
+        </div>
+    </div>
+    <hr/>
+    <div class="row mb-3">
+        <div class="col-md-12 careerslist" id="ajax_loader">
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="viewmore-colg" id="viewmore">View more</div>
+        </div>
+    </div>
+    <div class="inrbg-1"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+    <div class="inrbg-2"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+    <div class="inrbg-3"><img src="{% static 'webapp/images/bg-2.png' %}"/></div>
+  </div>
+<div class="preloader">
+  <i class="fa fa-spin fa-spinner fa-2x"></i>
+</div>
+   <script type="text/javascript">
+	   $(document).ready(function() {
+			$('.preloader').show();
+			$('.viewmore-colg').hide();
+			var initial_flag = true;
+			var url = '{{ api_url }}' + 'api/careers/';
+			fetch_careers(url);
+			function fetch_careers(api_url) {
+				$.ajax({
+				  url: api_url,
+				  headers: {
+						'Authorization': 'Bearer ' + '{{ api_token }}',
+						'Content-Type':'application/json'
+				  },
+				  type: "get",
+				  dataType: 'json',
+				  data: {
+				  },
+				  success: function(response) {
+					var api_url = '{{ api_url }}';
+					var results = response.results;
+					for(var i=0; i < results.length; i++){
+						if (results[i].logo != null) {
+							img_path = api_url + results[i].logo;
+						} else{
+							img_path = '/static/webapp/images/default-thumb.jpg';
+						}
+						$('#ajax_loader').append('<div class="row mb-2 dy-box"><div class="col-md-12"><div class="collegelistitem"><div class="collegelistimg mr-3"><div class="imgwrap1"><div class="imgwrap2"><img src="' + img_path + '" alt="Get2Work"></div></div></div><div class="collegetitletag"><h1 class="pt-4">'+  results[i].career +'</h1></div><div class="viewclgdetailsbtn mt-3"><a href="/careers/'+ results[i].uid +'" class="btn btn-sm btn-primary">View Details</a></div></div></div></div>');
+					}
+					$('.preloader').hide();
+					if (response.next != null){
+						url = response.next;
+						$('.viewmore-colg').show();
+					}
+					else{
+					    $('.viewmore-colg').hide();
+					}
+					if (initial_flag){
+                        if (results.length == 0){
+                            $('#ajax_loader').before('<div class="row mb-2 dy-box"><div class="col-md-12 text-center"><span class="no_result"><i class="fas fa-exclamation-triangle text-warning"></i> No result found</span></div></div>');
+                        }
+                        initial_flag = false;
+                    }
+				  },
+				  error: function(XMLHttpRequest, textStatus, errorThrown) {
+					$('.preloader').hide();
+				  }
+				});
+			}
+
+			$(".viewmore-colg").on("click", function () {
+				$('.viewmore-colg').hide();
+				fetch_careers(url);
+			});
+		});
+   </script>
+{% endblock %}

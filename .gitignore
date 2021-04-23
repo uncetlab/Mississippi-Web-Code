@@ -1,0 +1,56 @@
+*.log
+*.pyc
+*__pycache__/
+*migrations/
+gearup_web/db.sqlite3
+gearup_web/gearup_web/settings.py
+media
+
+# Backup files # 
+*.bak 
+
+Migrations
+
+# If you are using PyCharm #
+.idea/
+.idea/**/workspace.xml 
+.idea/**/tasks.xml 
+.idea/dictionaries 
+.idea/**/dataSources/ 
+.idea/**/dataSources.ids 
+.idea/**/dataSources.xml 
+.idea/**/dataSources.local.xml 
+.idea/**/sqlDataSources.xml 
+.idea/**/dynamic.xml 
+.idea/**/uiDesigner.xml 
+.idea/**/gradle.xml 
+.idea/**/libraries 
+*.iws /out/ 
+
+
+# Environments 
+.env 
+.venv 
+env/ 
+venv/ 
+ENV/ 
+env.bak/ 
+venv.bak/
+
+# mkdocs documentation 
+/site 
+
+# mypy 
+.mypy_cache/ 
+
+# Sublime Text # 
+*.tmlanguage.cache 
+*.tmPreferences.cache 
+*.stTheme.cache 
+*.sublime-workspace 
+*.sublime-project
+
+# Visual Studio Code # 
+.vs/*
+.vscode/*
+

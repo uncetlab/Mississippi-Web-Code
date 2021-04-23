@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Get2College | {{name}}{% endblock %}
+{% block content %}
+    <div class="container position-relative bg-white">
+        <div class="row mb-2">
+            <div class="col-md-12 d-flex">
+                <h1 class="page-title">{{name}}</h1>
+              <div class="ml-auto">
+
+                  <ul class="list-group flex-row social-icons detailpage-ico">
+                    {% if email %}
+                      <li class="list-group-item border-0"><a href="mailto:{{email}}" class="clg-details-ico-mail"><i class="far fa-envelope"></i></a></li>
+                    {% endif %}
+                    {% if facebook_url %}
+                      <li class="list-group-item border-0"><a href="{{facebook_url}}" target="_blank" class="clg-details-ico-fb"><i class="fab fa-facebook-f"></i></a></li>
+                    {% endif %}
+                    {% if twitter_url %}
+                      <li class="list-group-item border-0"><a href="{{twitter_url}}" target="_blank" class="clg-details-ico-tw"><i class="fab fa-twitter"></i></a></li>
+                    {% endif %}
+                    {% if linkedin_url %}
+                      <li class="list-group-item border-0"><a href="{{linkedin_url}}" target="_blank" class="clg-details-ico-in"><i class="fab fa-linkedin-in"></i></a></li>
+                    {% endif %}
+                    {% if website %}
+                      <li class="list-group-item border-0"><a href="{{website}}" target="_blank" class="btn btn-primary btn-sm btn-visit">Visit Website</a></li>
+                    {% endif %}
+                  </ul>
+
+              </div>
+            </div>
+        </div>
+    {%  if video %}
+      <div class="row">
+            <div class="col-md-12 p-0">
+                <video height="500" id="videojs-vr-player1" class="video-js vjs-default-skin videowd" controls playsinline crossorigin="anonymous">
+                    <source src="{{video.url}}" crossorigin="anonymous">
+                </video>
+                <div class="video-static-content">
+                    <img src="{% static 'webapp/images/video-play-btn.png' %}" alt="Play Video" class="video-play-btn" />
+                    {% if video.thumbnail %}
+                        <img src="{{api_url}}{{video.thumbnail}}" alt="Video"  class="video-thumb"/>
+                    {% else %}
+                     <img src="{% static 'webapp/images/video-thumb.jpg' %}" alt="Video"  class="video-thumb"/>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif  %}
+    {% if light_mode_content %}
+        <div class="row ml-1 mr-1 ">
+            <div class="col-md-12 pt-2 pb-5 contentarea">
+                <div class="ql-editor">
+                {{content |safe}}
+              </div>
+                
+            </div>
+        </div>
+    {% endif %}
+    <div class="inrbg-1"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+    <div class="inrbg-2"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+    <div class="inrbg-3"><img src="{% static 'webapp/images/bg-2.png' %}"/></div>
+  </div>
+{% endblock %}

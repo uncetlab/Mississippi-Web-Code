@@ -1,0 +1,636 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Get2College | MS Colleges{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+
+    <div class="container position-relative pb-4 bg-white">
+  		<div class="row mb-2">
+            <div class="col-md-12 d-flex">
+            	<h1 class="page-title">MS Colleges</h1>
+            	<div class="ml-auto">
+                    <ul class="list-group flex-row social-icons clg-list-actns pt-1">
+                        <li class="list-group-item border-0 pl-0"><button id="filterBtn" class="btn btn-sm btn-outline-secondary"><i class="fas fa-sliders-h"></i> Filter</button></li>
+                         <li class="list-group-item border-0 pl-0 pr-0"><button id="map_view" class="btn btn-sm btn-outline-secondary"><i class="fas fa-map-marked-alt"></i> Map View</button></li>
+                          <li class="list-group-item border-0 pl-0"><button id="list_view" class="btn btn-sm btn-outline-secondary"><i class="fas fa-map-marker-alt"></i> List View</button></li>
+                          <li class="list-group-item border-0 pl-0">
+
+                          	  <div class="input-group">
+                            <input id="search" type="text" class="form-control deletable" placeholder="Search" aria-label="Search" aria-describedby="search">
+                            <div class="input-group-append">
+                                <button id="btnSearch" class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+                          </li>
+                    </ul>
+
+
+                </div>
+            </div>
+        </div>
+        <hr/>
+
+ 		<div class="row mb-2 listarea-container">
+            <div class="col-md-12">
+                   <div class="ajax_loader">
+	                	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="viewmore-colg">View more colleges</div>
+		                    </div>
+	                	</div>
+	                </div>
+            </div>
+         </div>
+
+        <div class="row mb-2 maparea-container">
+            <div class="col-md-8">
+                <div id="mapid" class="map-wrap"></div>
+            </div>
+            <div class="col-md-4">
+
+                <div class="map-search">
+	                <div class="ajax_loader">
+	                	<div class="row">
+		                    <div class="col-md-12">
+		                        <div class="viewmore-colg" id="viewmore">View more colleges</div>
+		                    </div>
+	                	</div>
+	                </div>
+                </div>
+            </div>
+      </div>
+	<div class="inrbg-1"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+    <div class="inrbg-2"><img src="{% static 'webapp/images/bg-1.png' %}"/></div>
+    <div class="inrbg-3"><img src="{% static 'webapp/images/bg-2.png' %}"/></div>
+  </div>
+
+	  <div id="filter">
+	  </div>
+	  <div id="filtercontent" class="filtercontent p-4" style="display: none;">
+		 <div class="filter-close" id="filter_close"><i class="far fa-times-circle" aria-hidden="true"></i></div>
+	  	<form id="filter_form" action="javascript:void(0);">
+		<div class="row">
+			<div class="col-md-12">
+				<h1>Filter By</h1>
+			</div>
+		</div>
+		<div class="row mt-4">
+			<div class="col-md-12">
+				<div class="form-check-inline mr-5">
+					  <label class="form-check-label">
+						<input type="radio" class="form-check-input" name="selectstate" value="in_state" checked>In State
+					  </label>
+				</div>
+				<div class="form-check-inline ml-5">
+					  <label class="form-check-label">
+						<input type="radio" class="form-check-input" name="selectstate" value="out_state">Out State
+					  </label>
+				</div>
+			</div>
+		</div>
+		<div class="row mt-4">
+			<div class="col-md-12">
+				<label class="d-block">SAT Score</label>
+				<div class="d-flex">
+				 <small class="mr-3">400</small><input id="satscore" type="text" class="span2" value="" data-slider-min="400" data-slider-max="1600" data-slider-step="1" data-slider-value="[400,1600]"/> <small class="ml-3">1600</small>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="row mt-4">
+			<div class="col-md-12">
+				<label class="d-block">ACT Score</label>
+				<div class="d-flex">
+				 <small class="mr-3">1</small><input id="actscore" type="text" class="span2" value="" data-slider-min="1" data-slider-max="36" data-slider-step="1" data-slider-value="[1,36]"/> <small class="ml-3">36</small>
+				</div>
+
+			</div>
+		</div>
+		<div class="row mt-4">
+			<div class="col-md-12" id="select_majors">
+				<label>Select Majors</label>
+				 <select name="majors" class="form-control selectmajors"  multiple="multiple" style="display: none;">
+					    {% for major in majors %}
+						<option value="{{major.uid}}">{{major.title}}</option>
+					    {% endfor %}
+				</select>
+			</div>
+		</div>
+		<div class="row mt-4">
+			<div class="col-md-12 mt-2 mb-1">
+				<label class="d-block">Student body size</label>
+				<div class="form-check-inline w-50">
+					  <label class="form-check-label">
+						<input type="radio" class="form-check-input" name="studentsize" value="bt,0,5000," />
+						  <span class="text-black">Below 5000</span>
+					  </label>
+				</div>
+				<div class="form-check-inline">
+					  <label class="form-check-label">
+						<input type="radio" class="form-check-input" name="studentsize" value="bt,5000,10000" />
+						  <span class="text-black">5000 - 10000</span>
+					  </label>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-check-inline w-50">
+					  <label class="form-check-label">
+						<input type="radio" class="form-check-input" name="studentsize" value="bt,10001,15000" />
+						  <span class="text-black">10001 - 15000</span>
+					  </label>
+				</div>
+				<div class="form-check-inline">
+					  <label class="form-check-label">
+						<input type="radio" class="form-check-input" name="studentsize" value="gt,15000,0" />
+						  <span class="text-black">Above 15000</span>
+					  </label>
+				</div>
+			</div>
+		</div>
+		<div class="row mt-4">
+			<div class="col-md-12">
+				<label class="d-block">Cost Per Year</label>
+				<div class="d-flex">
+				 <small class="mr-3">$500</small><input id="costpersize" type="text" class="span2" value="" data-slider-min="500" data-slider-max="70000" data-slider-step="1" data-slider-value="[500,70000]"/> <small class="ml-3">$70000</small>
+				</div>
+
+			</div>
+		</div>
+		<div class="row mt-5">
+			<div class="col-md-12 text-right">
+				<button class="btn btn-sm btn-outline-secondary mr-2" id="filter_clear">Clear</button>
+				<button class="btn btn-sm btn-primary" id="filter_apply">Apply Filters</button>
+			</div>
+		</div>
+	  </form>
+	</div>
+
+<div class="preloader">
+  <i class="fa fa-spin fa-spinner fa-2x"></i>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+
+<script type="text/javascript">
+	$(function() {
+		new popup('#filter', '#filterBtn', {
+			content: $('#filtercontent'),
+			duration: 500
+		}).popupRight();
+		$("#satscore").slider({
+		});
+		$("#actscore").slider({
+		});
+		$("#costpersize").slider({
+		});
+		$("select.selectmajors").bsMultiSelect({cssPatch : {
+			   choices: {columnCount:'2' },
+		}});
+	});
+
+</script>
+<script type="text/javascript">
+	window.onunload = function(){}; 
+	$(window).bind("pageshow", function(event) {
+    	if (event.originalEvent.persisted) {
+        	location.reload();
+    	}
+	});
+	var map_filter = true;
+	var map_bound = false;
+	var map_plot = true;
+	var map_clear = true;
+	var map;
+	var focused = false;
+	var latlngs = [];
+	var initial_filter = false;
+	var colleges = L.layerGroup();
+	var bounds;
+	var blueIcon = new L.Icon({
+		iconUrl: 'https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon.png',
+		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
+		popupAnchor: [1, -34],
+		shadowSize: [41, 41]
+	});
+
+	var greenIcon = new L.Icon({
+		iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+		shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
+		popupAnchor: [1, -34],
+		shadowSize: [41, 41]
+	});
+	var focused_lat;
+	var focused_lng;
+	var map_intialised = false;
+	function focusCollege(lat, lng, name) {
+			focused = true
+			focused_lat = lat;
+			focused_lng = lng;
+			map.setView([lat,lng], 13);
+			for (var i = 0; i < latlngs.length; i++) {
+				if (latlngs[i][0] == parseFloat(lat) & latlngs[i][1] ==parseFloat(lng)){
+					L.marker([lat, lng], {icon: greenIcon}).bindPopup(name).addTo(colleges).openPopup()
+			  	}
+			  	else{
+					L.marker(latlngs[i], {icon: blueIcon}).addTo(colleges)
+
+			  	}
+			}
+			focused = false;
+			$('.viewmore-colg').hide();
+	};
+
+	$(document).ready(function() {
+		var params = {}
+		$("#search").val('');
+		$('#filter_form').trigger("reset");
+		$("#satscore").slider('refresh');
+		$("#actscore").slider('refresh');
+		$("#costpersize").slider('refresh');
+		$('#filter').hide();
+		
+		$('.viewmore-colg').hide();
+		$('.preloader').show();
+		$('.form-check-input').prop('checked', false);
+
+		mbUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+		var streets  = L.tileLayer(mbUrl, {id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1});
+		var location_points = {};
+
+		map = L.map('mapid', {
+			zoom: 10,
+			layers: [streets, colleges]
+		});
+
+		var baseLayers = {
+			// "Grayscale": grayscale,
+			"Streets": streets
+		};
+
+		var overlays = {
+			"Colleges": colleges
+		};
+
+		L.control.layers(baseLayers, overlays).addTo(map);
+		map.on('viewreset',function(e){
+			location_points = {}
+		})
+
+		map.on('zoomend',function(e){
+		  var map = e.target,
+		  bounds = map.getBounds();
+
+		  location_points = {
+					"lat1": bounds._northEast.lat,
+					"lng1": bounds._northEast.lng,
+					"lat2": bounds._southWest.lat,
+					"lng2": bounds._southWest.lng
+				}
+		   if (!focused){
+				var url = '{{ api_url }}' + 'api/colleges/';
+				remove_flag = true;
+				map_clear = false;
+				filter_search(url);
+		   }
+		   // focused = false;
+
+		})
+		map.on("moveend", function (e) {
+			if (!focused){
+
+			  var map = e.target,
+			  bounds = map.getBounds();
+			  location_points = {
+						"lat1": bounds._northEast.lat,
+						"lng1": bounds._northEast.lng,
+						"lat2": bounds._southWest.lat,
+						"lng2": bounds._southWest.lng
+					}
+			  var url = '{{ api_url }}' + 'api/colleges/';
+			  remove_flag = true;
+			  map_clear = false;
+			  filter_search(url)
+			}
+		});
+		map.on('dragend',function(e){
+		  var map = e.target,
+		  bounds = map.getBounds();
+		  location_points = {
+					"lat1": bounds._northEast.lat,
+					"lng1": bounds._northEast.lng,
+					"lat2": bounds._southWest.lat,
+					"lng2": bounds._southWest.lng
+				}
+		  var url = '{{ api_url }}' + 'api/colleges/';
+		  remove_flag = true;
+		  map_clear = false;
+		  filter_search(url)
+		})
+
+		var url = '{{ api_url }}' + 'api/colleges/';
+		var filter_flag = false;
+		var remove_flag = true;
+		fetch_colleges(url);
+
+		function fetch_colleges(api_url) {
+			$.ajax({
+			  url: api_url,
+			  headers: {
+					'Authorization': 'Bearer ' + '{{ api_token }}',
+					'Content-Type':'application/json'
+			  },
+			  type: "get",
+			  dataType: 'json',
+			  data: {
+			  },
+			  success: function(response) {
+				var api_url = '{{ api_url }}';
+				var results = response.results;
+				// var locations = []
+				for(var i=0; i < results.length; i++){
+					var lat = parseFloat(results[i].location.latitude)
+					var lng = parseFloat(results[i].location.longitude)
+					L.marker([lat, lng]).bindPopup(results[i].name).addTo(colleges)
+					latlngs.push([lat, lng])
+
+					tags_list = results[i].tags.split(',')
+					var tag_div = ''
+					for(var j=0; j < tags_list.length;j++)
+					{
+						tag_div = tag_div + '<div class="tagitem">'+ tags_list[j] +'</div>'
+					}
+					$('.ajax_loader').before('<div class="row mb-2 dy-box"><div class="col-md-12"><div class="collegelistitem"><div class="collegelistimg mr-3"><div class="imgwrap1"><div class="imgwrap2"><img src="' + api_url + results[i].logo + '" alt="college logo"></div></div></div><div class="collegetitletag" onclick="focusCollege(\'' + lat + '\',\'' + lng + '\',\'' + results[i].name + '\')"><h1>'+ results[i].name +'</h1> ' + tag_div + '</div><div class="viewclgdetailsbtn mt-2 formap"><a href="/colleges/'+ results[i].uid +'" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i></a></div><div class="viewclgdetailsbtn mt-2 forlist"><a href="/colleges/'+ results[i].uid +'" class="btn btn-sm btn-primary">View Details</a></div></div></div></div>');
+				}
+				$('.preloader').hide();
+				if (response.next != null){
+					url = response.next;
+					$('.viewmore-colg').show();
+				}
+				else{
+					$('.viewmore-colg').hide();
+				}
+				if (results.length == 0){
+					$('.ajax_loader').before('<div class="row mb-2 dy-box"><div class="col-md-12 text-center"><span class="no_result"><i class="fas fa-exclamation-triangle text-warning"></i> No result found</span></div></div>');
+					$('.viewmore-colg').hide();
+				}
+				map.fitBounds(latlngs);
+			  },
+			  error: function(xhr) {
+				$('.preloader').hide();
+			  }
+			});
+		};
+
+
+		$(".viewmore-colg").on("click", function () {
+			$('.viewmore-colg').hide();
+			if (filter_flag){
+				map_plot = true;
+				map_clear = false;
+				remove_flag = false;
+				filter_search(url);
+			}else{
+				fetch_colleges(url);
+			}
+		});
+
+		$("#filter_close").on("click", function () {
+			$('#filter').hide();
+		});
+
+		$("#filter_clear").on("click", function () {
+			 if (map_filter){
+				map_bound = true;
+		     }
+			 location_points = {};
+			 $('#filter_form').trigger("reset");
+			 $("#satscore").slider('refresh');
+			 $("#actscore").slider('refresh');
+			 $("#costpersize").slider('refresh');
+			 $('#filter').hide();
+			 $('input[name=studentsize]').attr('checked',false);
+			 var url = '{{ api_url }}' + 'api/colleges/';
+			 $('.preloader').show();
+			 filter_flag = false;
+			 remove_flag = true;
+			 map_plot = true;
+			 map_clear = true
+			 filter_search(url)
+		});
+
+		$("#btnSearch").on("click", function () {
+			keyword = $('#search').val();
+			if (keyword == ''){
+				swal("Please enter a keyword to search!", {
+				  icon: "warning",
+				  buttons: false,
+				  timer: 2000,
+				});
+				return;
+			}
+			var url = '{{ api_url }}' + 'api/colleges/';
+			$('.preloader').show();
+			remove_flag = true;
+			map_plot = true;
+			map_clear = true
+			filter_search(url)
+		});
+
+		$("#filterBtn").on("click", function () {
+			 $('#filter').show();
+		});
+
+		$("#filter_apply").on("click", function () {
+			 var url = '{{ api_url }}' + 'api/colleges/';
+			 location_points = {};
+			 if (map_filter)
+			 {
+				map_bound = true;
+			 }
+			 remove_flag = true;
+			 map_plot = true;
+			 map_clear = true;
+			 $('.preloader').show();
+			 $('#filter').hide();
+			 filter_search(url)
+		});
+
+		function filter_search(api_url) {
+			filter_flag = true;
+			params['query'] = $('#search').val()
+			var keyword = $('#search').val();
+			var state_type = $("input[name='selectstate']:checked").val();
+			if (state_type != undefined )
+			{
+				params['state_type'] = state_type;
+			}
+			var majors = [];
+			$('#select_majors :selected').each(function(i, selected){
+				majors[i] = $(selected).val();
+			});
+			if (majors.length > 0){
+				params['majors'] = majors;
+			}
+			else{
+				delete params.majors;
+			}
+			var satscorearr = $("#satscore").val().split(',');
+			params['sat_score_range'] ={
+				"min": parseInt(satscorearr[0]),
+				"max": parseInt(satscorearr[1])
+			}
+			var actscorearr = $("#actscore").val().split(',');
+			params['act_score_range'] = {
+				"min": parseInt(actscorearr[0]),
+				"max": parseInt(actscorearr[1])
+			}
+			var costpersizearr = $("#costpersize").val().split(',');
+			params['avg_cost_range'] = {
+				"min": parseInt(costpersizearr[0]),
+				"max": parseInt(costpersizearr[1])
+			}
+			var studentsize = $("input[name='studentsize']:checked").val();
+			if (studentsize != undefined )
+			{
+				var studentsizearr = studentsize.split(',');
+				params['student_capacity'] = {
+					"operator": studentsizearr[0],
+					"value1": parseInt(studentsizearr[1]),
+					"value2": parseInt(studentsizearr[2])
+					}
+			}
+			else{
+				delete params.student_capacity;
+			}
+			if(map_clear){
+				colleges.clearLayers();
+				latlngs = [];
+				focused_lat = '';
+				focused_lng = '';
+				// map_filter = false;
+			}
+			if (!focused && map_filter){
+				if (location_points){
+					params['location_poly'] = location_points
+				}
+			}
+			var filter_data = {}
+			filter_data['filter'] = params;
+
+			$.ajax({
+			  type: "POST",
+			  headers: {
+					'Authorization': 'Bearer ' + '{{ api_token }}',
+					'Content-Type':'application/json'
+			  },
+			  url: api_url,
+			  dataType: 'json',
+			  data: JSON.stringify(filter_data),
+			  success: function(response){
+				var api_url = '{{ api_url }}';
+				if (remove_flag){
+					$('.dy-box').remove();
+				}
+				var results = response.results;
+				for(var i=0; i < results.length; i++){
+					if(map_plot) {
+						var lat = parseFloat(results[i].location.latitude)
+						var lng = parseFloat(results[i].location.longitude)
+						if(lat === parseFloat(focused_lat) && lng === parseFloat(focused_lng)){
+							L.marker([lat, lng], {icon: greenIcon}).bindPopup(results[i].name).addTo(colleges).openPopup()
+						}else{
+							L.marker([lat, lng], {icon: blueIcon}).bindPopup(results[i].name).addTo(colleges)
+						}
+
+						latlngs.push([lat, lng])
+					}
+					tags_list = results[i].tags.split(',')
+					var tag_div = ''
+					for(var j=0; j < tags_list.length;j++)
+					{
+						tag_div = tag_div + '<div class="tagitem">'+ tags_list[j] +'</div>'
+					}
+
+					$('.ajax_loader').before('<div class="row mb-2 dy-box"><div class="col-md-12"><div class="collegelistitem"><div class="collegelistimg mr-3"><div class="imgwrap1"><div class="imgwrap2"><img src="' + api_url + results[i].logo + '" alt="college logo"></div></div></div><div class="collegetitletag" onclick="focusCollege(\'' + lat + '\',\'' + lng + '\',\'' + results[i].name + '\')"><h1>'+ results[i].name +'</h1> ' + tag_div + '</div><div class="viewclgdetailsbtn mt-3 formap"><a href="/colleges/'+ results[i].uid +'" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-right"></i></a></div><div class="viewclgdetailsbtn mt-3 forlist"><a href="/colleges/'+ results[i].uid +'" class="btn btn-sm btn-primary">View Details</a></div></div></div></div>');
+
+				}
+				if(map_bound){
+					if (results.length > 0)
+					{
+						map.fitBounds(latlngs);
+					}
+					map_bound = false;
+				}
+				$('.preloader').hide();
+				if (response.next != null){
+					url = response.next;
+					$('.viewmore-colg').show();
+				}
+				else{
+					$('.viewmore-colg').hide();
+				}
+				if (results.length == 0){
+					$('.ajax_loader').before('<div class="row mb-2 dy-box"><div class="col-md-12 text-center"><span class="no_result"><i class="fas fa-exclamation-triangle text-warning"></i> No result found</span></div></div>');
+					$('.viewmore-colg').hide();
+				}
+			  },
+			  error: function(XMLHttpRequest, textStatus, errorThrown) {
+				$('.preloader').hide();
+			  }
+			});
+		}
+
+		$('input.deletable').wrap('<span class="deleteicon" />').after($('<span/>').click(function() {
+			$(this).prev('input').val('').trigger('change').focus();
+			location_points = {};
+			if (map_filter)
+			{
+				map_bound = true;
+			}
+			remove_flag = true;
+			map_plot = true;
+			map_clear = true
+			var url = '{{ api_url }}' + 'api/colleges/';
+			$('.preloader').show();
+			filter_search(url);
+		}));
+
+		$("#map_view").click(function(){
+		   map_filter = true;
+		   focused = false;
+		   location_points = {};
+		   if (map_filter){
+				map_bound = true;
+		   }
+		   $("#filter_apply").click();
+		   $(".listarea-container").hide();
+		   $(".maparea-container").show();
+		   $("#map_view").hide();
+		   $("#list_view").show();
+		});
+
+		$("#list_view").click(function(){
+		   map_filter = false;
+		   focused = false;
+		   $("#filter_apply").click();
+		   $(".listarea-container").show();
+		   $(".maparea-container").hide();
+		   $("#map_view").show();
+		   $("#list_view").hide();
+		});
+	});
+   </script>
+{% endblock %}

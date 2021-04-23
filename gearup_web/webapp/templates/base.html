@@ -1,0 +1,57 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="shortcut icon" href="{% static 'webapp/images/favicon.png' %}" type="image/x-icon">
+    <title>
+		{% block title %}Get2College{% endblock %}
+	</title>
+    <link href="{% static 'webapp/bootstrap/css/bootstrap.min.css' %}" type="text/css" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/d0ac50ac9c.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'webapp/css/video-js.css' %}">
+    <link href="{% static 'webapp/css/styles.css' %}" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="{% static 'webapp/js/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'webapp/js/popper.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'webapp/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'webapp/js/slidepanel.js' %}"></script>
+    <script type="text/javascript" src="{% static 'webapp/js/advmenu.js' %}"></script>
+    <script type="text/javascript" src="{% static 'webapp/js/bootstrap-slider.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'webapp/js/BsMultiSelect.js' %}"></script>
+    <script type="text/javascript" src="{% static 'webapp/js/sweetalert.min.js' %}"></script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container-fluid">
+            {% include 'menu.html' %}
+        </div>
+        {% block content %}
+        {% endblock %}
+        <div class="push"></div>
+    </div>
+    <footer class="sticky-footer" class="py-4 bg-dark text-white-50">
+        <div class="container text-center"> <small>Copyright &copy; Get2College</small> </div>
+    </footer>
+    {% block scripts %}
+    <!-- {# <script src="{% static 'webapp/js/video.js' %}" integrity="sha256-vrHnet1gn0rfMfcNSTaMvp7bW1MU+hBXCuyPjfdxXhc=" crossorigin="anonymous"></script>
+    <script src="{% static 'webapp/js/videojs-vr.js' %}" integrity="sha256-aVLbKVeaTsLwmKYjya1a4xZGhAaG7j3Z4Ll7SkzSa6A=" crossorigin="anonymous"></script> #} -->
+    <script src="https://cdn.jsdelivr.net/npm/video.js@7.4.1/dist/video.js" integrity="sha256-vrHnet1gn0rfMfcNSTaMvp7bW1MU+hBXCuyPjfdxXhc=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-vr@1.5.0/dist/videojs-vr.js" integrity="sha256-aVLbKVeaTsLwmKYjya1a4xZGhAaG7j3Z4Ll7SkzSa6A=" crossorigin="anonymous"></script>
+    <script>
+    	if (document.getElementById("videojs-vr-player1")){
+
+	        (function(window, videojs) {
+	            var player = window.player = videojs('videojs-vr-player1');
+	            player.mediainfo = player.mediainfo || {};
+	            player.mediainfo.projection = '360';
+
+	            // AUTO is the default and looks at mediainfo
+	            var vr = window.vr = player.vr({projection: 'AUTO', debug: true, forceCardboard: false});
+	        }(window, window.videojs));
+    	}
+    </script>
+    {% endblock %}
+</body>
+</html>

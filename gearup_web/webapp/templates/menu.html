@@ -1,0 +1,41 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg pt-0 pb-0 pl-0 mb-2 container advmenu">
+    <a class="navbar-brand p-0" href="/">
+        <img src="{% static 'webapp/images/get2college-logo.png' %}" alt="Get2College app logo" /></a>
+      <ul class="mr-auto links">
+        {% for item in menu %}
+            {% if item.url_type == "external" %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ item.url }}" target="_blank">{{ item.title }}</a>
+                </li>
+            {% elif item.url_type == "pre_defined" %}
+                {% if request.resolver_match.url_name == "college_detail" and item.key_name == "NC_COLLEGES" %}
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url item.key_name %}">{{ item.title }}
+                    {% if request.resolver_match.url_name == item.key_name %}<span class="sr-only">(current)</span>{% endif %}
+                    </a>
+                </li>
+                {% elif request.resolver_match.url_name == "career_detail" and item.key_name == "CAREERS" %}
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url item.key_name %}">{{ item.title }}
+                    {% if request.resolver_match.url_name == item.key_name %}<span class="sr-only">(current)</span>{% endif %}
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item {% if request.resolver_match.url_name == item.key_name %}active{% endif %}">
+                    <a class="nav-link" href="{% url item.key_name %}">{{ item.title }}
+                    {% if request.resolver_match.url_name == item.key_name %}<span class="sr-only">(current)</span>{% endif %}
+                    </a>
+                </li>
+                {% endif %}
+            {% elif item.url_type == "native" %}
+                <li class="nav-item {% if item.page in request.path %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'custom-page' item.page %}">{{ item.title }}
+                    {% if item.page in request.path %}<span class="sr-only">(current)</span>{% endif %}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+      </ul>
+  <button><i class="fas fa-ellipsis-h"></i></button>
+  <ul class="hidden-links hidden"></ul>
+  </nav>
